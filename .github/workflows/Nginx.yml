@@ -1,0 +1,63 @@
+name: Build Nginx
+
+on:
+  repository_dispatch:
+  push:
+    tags:        
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Go environment
+        uses: actions/setup-go@v3
+        with:
+         go-version: 1.19.1
+      
+      - name: Initialization environment
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade
+          sudo apt-get install build-essential ca-certificates zlib1g-dev libpcre3 libpcre3-dev tar unzip libssl-dev wget curl git cmake ninja-build gnupg2 lsb-release libunwind-dev ubuntu-keyring fakeroot
+          curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+          echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/mainline/ubuntu `lsb_release -cs` nginx" | sudo tee /etc/apt/sources.list.d/nginx.list
+          echo "deb-src [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/mainline/ubuntu `lsb_release -cs` nginx" | sudo tee -a /etc/apt/sources.list.d/nginx.list
+          sudo apt-get update
+          
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+         version: 11
+         platform: x64
+
+      - name: Brotli
+        run: |
+          git clone https://github.com/google/ngx_brotli.git
+          cd ngx_brotli && git submodule update --init
+          cd ..
+
+      - name: Bulid
+        run: |
+          sudo apt-get build-dep nginx
+          apt-get source nginx
+          NG=$(ls -d nginx-*)
+          sudo sed -i 's#--with-ld-opt="$(LDFLAGS)"#& --add-module=/home/runner/work/Nginx/Nginx/ngx_brotli#' /home/runner/work/Nginx/Nginx/$NG/debian/rules
+          cd $NG
+          dpkg-buildpackage -uc -us -b
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: nginx
+          path: /home/runner/work/Nginx/Nginx/*.deb
+          
+      - uses: xresloader/upload-to-github-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: "*.deb"
+          overwrite: true
+          verbose: true
