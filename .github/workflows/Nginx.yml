@@ -45,14 +45,14 @@ jobs:
           sudo apt-get build-dep nginx
           apt-get source nginx
           NG=$(ls -d nginx-*)
-          sudo sed -i 's#--with-ld-opt="$(LDFLAGS)"#& --add-module=/home/runner/work/Nginx/Nginx/ngx_brotli#' /home/runner/work/Nginx/Nginx/$NG/debian/rules
+          sudo sed -i 's#--with-ld-opt="$(LDFLAGS)"#& --add-module=/home/runner/work/Nginx-Brotli/Nginx-Brotli/ngx_brotli#' /home/runner/work/Nginx/Nginx/$NG/debian/rules
           cd $NG
           dpkg-buildpackage -uc -us -b
 
       - uses: actions/upload-artifact@v3
         with:
           name: nginx
-          path: /home/runner/work/Nginx/Nginx/*.deb
+          path: /home/runner/work/Nginx-Brotli/Nginx-Brotli/*.deb
           
       - uses: xresloader/upload-to-github-release@v1
         env:
