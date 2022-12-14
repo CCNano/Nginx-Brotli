@@ -45,7 +45,7 @@ jobs:
           sudo apt-get build-dep nginx
           apt-get source nginx
           NG=$(ls -d nginx-*)
-          sudo sed -i 's#--with-ld-opt="$(LDFLAGS)"#& --add-module=/home/runner/work/Nginx-Brotli/Nginx-Brotli/ngx_brotli#' /home/runner/work/Nginx/Nginx/$NG/debian/rules
+          sudo sed -i 's#--with-ld-opt="$(LDFLAGS)"#& --add-module=/home/runner/work/Nginx-Brotli/Nginx-Brotli/ngx_brotli#' /home/runner/work/Nginx-Brotli/Nginx-Brotli/$NG/debian/rules
           cd $NG
           dpkg-buildpackage -uc -us -b
 
