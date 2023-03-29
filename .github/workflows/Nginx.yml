@@ -16,7 +16,7 @@ jobs:
       - name: Setup Go environment
         uses: actions/setup-go@v4
         with:
-         go-version: 1.19.1
+         go-version: 1.20.2
       
       - name: Initialization environment
         run: |
@@ -31,7 +31,7 @@ jobs:
       - name: Set up GCC
         uses: egor-tensin/setup-gcc@v1
         with:
-         version: 11
+         version: 12
          platform: x64
 
       - name: Brotli
