@@ -44,7 +44,7 @@ jobs:
           cd $NG
           dpkg-buildpackage -uc -us -b
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: nginx
           path: /home/runner/work/Nginx-Brotli/Nginx-Brotli/*.deb
